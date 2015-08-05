@@ -150,12 +150,14 @@ class Message():
             for content in self.message.walk():
                 if content.get_content_type() == "text/plain":
                     self.body = content.get_payload(decode=True)
-                    self.body_charset = content.get_content_charset()
+                    self.body_charset = content.get_content_charset('n/a')
                 elif content.get_content_type() == "text/html":
                     self.html = content.get_payload(decode=True)
-                    self.html_charset = content.get_content_charset()
+                    self.html_charset = content.get_content_charset('n/a')
         elif self.message.get_content_maintype() == "text":
             self.body = self.message.get_payload()
+            self.body_charset = self.message.get_content_charset('n/a')
+
 
         self.sent_at = datetime.datetime.fromtimestamp(time.mktime(email.utils.parsedate_tz(self.message['date'])[:9]))
 
