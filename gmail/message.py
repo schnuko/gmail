@@ -150,8 +150,10 @@ class Message():
             for content in self.message.walk():
                 if content.get_content_type() == "text/plain":
                     self.body = content.get_payload(decode=True)
+                    self.body_charset = content.get_content_charset()
                 elif content.get_content_type() == "text/html":
                     self.html = content.get_payload(decode=True)
+                    self.html_charset = content.get_content_charset()
         elif self.message.get_content_maintype() == "text":
             self.body = self.message.get_payload()
 
