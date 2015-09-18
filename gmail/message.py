@@ -3,6 +3,7 @@ import email
 import re
 import time
 import os
+import HTMLParser
 from email.header import decode_header, make_header
 from imaplib import ParseFlags
 
@@ -36,6 +37,9 @@ class Message():
         self.message_id = None
  
         self.attachments = None
+
+        self.htmlParser = HTMLParser.HTMLParser()
+        self.default_charset = 'iso-8859-15'
         
 
 
@@ -130,7 +134,7 @@ class Message():
 
     def parse_subject(self, encoded_subject):
         dh = decode_header(encoded_subject)
-        default_charset = 'iso-8859-15'
+        default_charset = self.default_charset
         return ''.join([ unicode(t[0], t[1] or default_charset) for t in dh ])
 
     def parse(self, raw_message):
@@ -149,19 +153,22 @@ class Message():
         if self.message.get_content_maintype() == "multipart":
             for content in self.message.walk():
                 if content.get_content_type() == "text/plain":
-                    self.body = content.get_payload(decode=True).decode(content.get_content_charset('iso-8859-15'), 'ignore')
+                    self.body = content.get_payload(decode=True).decode(content.get_content_charset(self.default_charset), 'ignore')
                     self.body_charset = content.get_content_charset('n/a')
                 elif content.get_content_type() == "text/html":
-                    self.html = content.get_payload(decode=True).decode(content.get_content_charset('iso-8859-15'), 'ignore')
+                    self.html = content.get_payload(decode=True).decode(content.get_content_charset(self.default_charset), 'ignore')
                     self.html_charset = content.get_content_charset('n/a')
         elif self.message.get_content_maintype() == "text":
             if self.message.get_content_subtype() == "plain":
-                self.body = self.message.get_payload(decode=True).decode(self.message.get_content_charset('iso-8859-15'), 'ignore')
+                self.body = self.message.get_payload(decode=True).decode(self.message.get_content_charset(self.default_charset), 'ignore')
                 self.body_charset = self.message.get_content_charset('n/a')
             elif self.message.get_content_subtype() == "html":
-                self.html = self.message.get_payload(decode=True).decode(self.message.get_content_charset('iso-8859-15'), 'ignore')
+                self.html = self.message.get_payload(decode=True).decode(self.message.get_content_charset(self.default_charset), 'ignore')
                 self.html_charset = self.message.get_content_charset('n/a')
 
+        # unescape html-entities
+        if self.html:
+            self.html = self.htmlParser.unescape(self.html)
 
         self.sent_at = datetime.datetime.fromtimestamp(time.mktime(email.utils.parsedate_tz(self.message['date'])[:9]))
 
