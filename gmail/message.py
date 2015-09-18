@@ -149,14 +149,18 @@ class Message():
         if self.message.get_content_maintype() == "multipart":
             for content in self.message.walk():
                 if content.get_content_type() == "text/plain":
-                    self.body = content.get_payload(decode=True)
+                    self.body = content.get_payload(decode=True).decode(content.get_content_charset('iso-8859-15'), 'ignore')
                     self.body_charset = content.get_content_charset('n/a')
                 elif content.get_content_type() == "text/html":
-                    self.html = content.get_payload(decode=True)
+                    self.html = content.get_payload(decode=True).decode(content.get_content_charset('iso-8859-15'), 'ignore')
                     self.html_charset = content.get_content_charset('n/a')
         elif self.message.get_content_maintype() == "text":
-            self.body = self.message.get_payload()
-            self.body_charset = self.message.get_content_charset('n/a')
+            if self.message.get_content_subtype() == "plain":
+                self.body = self.message.get_payload(decode=True).decode(self.message.get_content_charset('iso-8859-15'), 'ignore')
+                self.body_charset = self.message.get_content_charset('n/a')
+            elif self.message.get_content_subtype() == "html":
+                self.html = self.message.get_payload(decode=True).decode(self.message.get_content_charset('iso-8859-15'), 'ignore')
+                self.html_charset = self.message.get_content_charset('n/a')
 
 
         self.sent_at = datetime.datetime.fromtimestamp(time.mktime(email.utils.parsedate_tz(self.message['date'])[:9]))
