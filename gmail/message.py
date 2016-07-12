@@ -26,6 +26,7 @@ class Message():
         self.fr = None
         self.cc = None
         self.delivered_to = None
+        self.x_forwarded_for = None
 
         self.sent_at = None
 
@@ -147,6 +148,7 @@ class Message():
         self.to = self.message['to']
         self.fr = self.message['from']
         self.delivered_to = self.message['delivered_to']
+        self.x_forwarded_for = self.message['x-forwarded-for'].split(' ')[0]
 
         self.subject = self.parse_subject(self.message['subject'])
 
@@ -235,7 +237,10 @@ class Attachment:
         # Raw file data
         self.payload = attachment.get_payload(decode=True)
         # Filesize in kilobytes
+        # if self.payload != None:
         self.size = int(round(len(self.payload)/1000.0))
+        # else:
+        #     self.size = 0
 
     def save(self, path=None):
         if path is None:
