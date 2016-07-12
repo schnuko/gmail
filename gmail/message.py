@@ -147,7 +147,7 @@ class Message():
 
         self.to = self.message['to']
         self.fr = self.message['from']
-        self.delivered_to = self.message['delivered_to']
+        self.delivered_to = self.message['delivered-to']
         self.x_forwarded_for = self.message['x-forwarded-for'].split(' ')[0]
 
         self.subject = self.parse_subject(self.message['subject'])
