@@ -237,10 +237,10 @@ class Attachment:
         # Raw file data
         self.payload = attachment.get_payload(decode=True)
         # Filesize in kilobytes
-        # if self.payload != None:
-        self.size = int(round(len(self.payload)/1000.0))
-        # else:
-        #     self.size = 0
+        if self.payload != None:
+            self.size = int(round(len(self.payload)/1000.0))
+        else:
+            self.size = 0
 
     def save(self, path=None):
         if path is None:
